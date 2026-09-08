@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import 'bulma/css/bulma.css';
 import './App.scss';
+import cn from 'classnames';
 
 enum SortType {
   NONE,
@@ -21,10 +22,12 @@ export const goodsFromServer = [
   'Garlic',
 ];
 
-export const App: React.FC = () => {
-  const [sortType, setSortType] = useState(SortType.NONE);
-  const [isReversed, setIsReversed] = useState(false);
-  const visibleGoods = [...goodsFromServer];
+function getVisibleGoods(
+  goods: string[],
+  sortType: SortType,
+  isReversed: boolean,
+): string[] {
+  const visibleGoods = [...goods];
 
   if (sortType === SortType.ALPHABET) {
     visibleGoods.sort();
@@ -38,16 +41,22 @@ export const App: React.FC = () => {
     visibleGoods.reverse();
   }
 
+  return visibleGoods;
+}
+
+export const App: React.FC = () => {
+  const [sortType, setSortType] = useState(SortType.NONE);
+  const [isReversed, setIsReversed] = useState(false);
+  const visibleGoods = getVisibleGoods(goodsFromServer, sortType, isReversed);
+
   return (
     <div className="section content">
       <div className="buttons">
         <button
           type="button"
-          className={
-            sortType === SortType.ALPHABET
-              ? 'button is-info'
-              : 'button is-info is-light'
-          }
+          className={cn('button', 'is-info', {
+            'is-light': sortType !== SortType.ALPHABET,
+          })}
           onClick={() => setSortType(SortType.ALPHABET)}
         >
           Sort alphabetically
@@ -55,11 +64,9 @@ export const App: React.FC = () => {
 
         <button
           type="button"
-          className={
-            sortType === SortType.LENGTH
-              ? 'button is-success'
-              : 'button is-success is-light'
-          }
+          className={cn('button', 'is-success', {
+            'is-light': sortType !== SortType.LENGTH,
+          })}
           onClick={() => setSortType(SortType.LENGTH)}
         >
           Sort by length
@@ -67,9 +74,9 @@ export const App: React.FC = () => {
 
         <button
           type="button"
-          className={
-            isReversed ? 'button is-warning' : 'button is-warning is-light'
-          }
+          className={cn('button', 'is-warning', {
+            'is-light': !isReversed,
+          })}
           onClick={() => setIsReversed(current => !current)}
         >
           Reverse
